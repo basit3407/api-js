@@ -26,7 +26,27 @@ export class QuranClient {
   public readonly resources: QuranResources;
   public readonly search: QuranSearch;
 
+  private static assertCredentials(
+    credentials: Pick<QuranClientConfig, "clientId" | "clientSecret">,
+  ): void {
+    const { clientId, clientSecret } = credentials;
+
+    if (!clientId?.trim()) {
+      throw new Error(
+        "QuranClient requires a clientId. Pass your Quran Foundation client credentials to continue.",
+      );
+    }
+
+    if (!clientSecret?.trim()) {
+      throw new Error(
+        "QuranClient requires a clientSecret. Pass your Quran Foundation client credentials to continue.",
+      );
+    }
+  }
+
   constructor(config: QuranClientConfig) {
+    QuranClient.assertCredentials(config);
+
     // Resolve configuration with defaults
     this.config = {
       contentBaseUrl: "https://apis.quran.foundation",
@@ -70,6 +90,7 @@ export class QuranClient {
         ...newConfig.defaults,
       },
     };
+    QuranClient.assertCredentials(this.config);
 
     // Update the fetcher with new config
     this.fetcher.updateConfig(this.config);
